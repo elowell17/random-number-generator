@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: #555;
+      margin-top: 30px;
+    }
+
+    button {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #result {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hello World!</h1>
+    <p>This is my first website.</p>
+    
+    <h2>Random Number Generator</h2>
+    <button onclick="generateNumber()">Generate Random Number</button>
+    <button onclick="generate100Numbers()" style="margin-left: 10px;">Generate 100 Numbers</button>
+    <p id="result">Click the button to generate a number!</p>
+  </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      // Initialize the heatmap data (10x10 grid, 1-100)
+      let heatmapData = [];
+      for (let i = 0; i < 10; i++) {
+        heatmapData[i] = [];
+        for (let j = 0; j < 10; j++) {
+          heatmapData[i][j] = 0; // Start with 0 hits
+        }
+      }
+
+      function generateNumber() {
+        const randomNumber = Math.floor(Math.random() * 100) + 1;
+        document.getElementById("result").innerHTML = "Your random number is: " + randomNumber;
+        
+        // Update the heatmap
+        updateHeatmap(randomNumber);
+      }
+
+      function generate100Numbers() {
+        const results = [];
+        document.getElementById("result").innerHTML = "Generating 100 numbers...";
+        
+        // Generate 100 numbers
+        for (let i = 0; i < 100; i++) {
+          const randomNumber = Math.floor(Math.random() * 100) + 1;
+          results.push(randomNumber);
+          updateHeatmap(randomNumber);
+        }
+        
+        // Show summary
+        const uniqueNumbers = [...new Set(results)].length;
+        document.getElementById("result").innerHTML = 
+          `Generated 100 numbers! Unique numbers: ${uniqueNumbers}/100. Check the heatmap below!`;
+      }
+
+      function updateHeatmap(number) {
+        // Convert number 1-100 to grid position
+        const row = Math.floor((number - 1) / 10);
+        const col = (number - 1) % 10;
+        
+        // Increment the count for this position
+        heatmapData[row][col]++;
+        
+        // Update the chart
+        updateChart();
+      }
+
+      function updateChart() {
+        // Flatten the 2D array for Chart.js
+        const flatData = [];
+        const labels = [];
+        
+        for (let i = 0; i < 10; i++) {
+          for (let j = 0; j < 10; j++) {
+            const number = i * 10 + j + 1;
+            flatData.push(heatmapData[i][j]);
+            labels.push(number.toString());
+          }
+        }
+        
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = flatData;
+        chart.update();
+      }
+
+      // Create the heatmap chart
+      let chart;
+      window.onload = function() {
+        const ctx = document.createElement('canvas');
+        ctx.style.marginTop = '20px';
+        document.querySelector('.container').appendChild(ctx);
+        
+        // Initialize with zeros
+        const initialData = [];
+        const labels = [];
+        for (let i = 1; i <= 100; i++) {
+          initialData.push(0);
+          labels.push(i.toString());
+        }
+        
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Number of Times Generated',
+              data: initialData,
+              backgroundColor: function(context) {
+                const value = context.dataset.data[context.dataIndex];
+                if (value === 0) return '#f0f0f0'; // Light gray for 0
+                if (value === 1) return '#ffeb3b'; // Yellow for 1
+                if (value === 2) return '#ff9800'; // Orange for 2
+                if (value === 3) return '#f44336'; // Red for 3+
+                return '#d32f2f'; // Dark red for 4+
+              },
+              borderColor: '#ddd',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Times Generated'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Numbers 1-100'
+                }
+              }
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: 'Random Number Heatmap (1-100)',
+                font: {
+                  size: 16
+                }
+              }
+            }
+          }
+        });
+      };
+    </script>
+</body>
+</html>
