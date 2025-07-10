@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <title>My Website</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
   <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
@@ -15,6 +20,9 @@
     <button onclick="generateNumber()">Generate Random Number</button>
     <button onclick="generate100Numbers()" style="margin-left: 10px;">Generate 100 Numbers</button>
     <p id="result">Click the button to generate a number!</p>
+    
+    <h2>React Components</h2>
+    <div id="react-root"></div>
   </div>
 
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -174,6 +182,148 @@
           }
         });
       };
+
+      // React Components
+      const { useState } = React;
+
+      // Dice Roller Component
+      function DiceRoller() {
+        const [diceResult, setDiceResult] = useState(null);
+        const [diceType, setDiceType] = useState(6);
+
+        const rollDice = () => {
+          const result = Math.floor(Math.random() * diceType) + 1;
+          setDiceResult(result);
+        };
+
+        // Helper to render dice face
+        function renderDiceFace() {
+          if (!diceResult) return null;
+          // d6: show pips
+          if (diceType === 6) {
+            // Pip positions for 1-6
+            const pipMap = [
+              [],
+              [[1, 1]],
+              [[0, 0], [2, 2]],
+              [[0, 0], [1, 1], [2, 2]],
+              [[0, 0], [0, 2], [2, 0], [2, 2]],
+              [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]],
+              [[0, 0], [0, 2], [1, 0], [1, 2], [2, 0], [2, 2]]
+            ];
+            const pips = pipMap[diceResult].map(([row, col], i) =>
+              React.createElement('div', {
+                key: i,
+                className: 'dice-pip',
+                style: {
+                  gridRow: row + 1,
+                  gridColumn: col + 1
+                }
+              })
+            );
+            return React.createElement('div', { className: 'dice-face dice6' }, pips);
+          }
+          // d4, d8, d10, d12, d20: show polygon with number
+          if ([4, 8, 10, 12, 20].includes(diceType)) {
+            const sides = diceType;
+            // SVG polygon points for regular polygons
+            const r = 45, cx = 50, cy = 50;
+            const points = Array.from({ length: sides }, (_, i) => {
+              const angle = (2 * Math.PI * i) / sides - Math.PI / 2;
+              return [
+                cx + r * Math.cos(angle),
+                cy + r * Math.sin(angle)
+              ].join(",");
+            }).join(" ");
+            return React.createElement('svg', {
+              className: 'dice-face dice-poly',
+              width: 100, height: 100, viewBox: '0 0 100 100'
+            },
+              React.createElement('polygon', {
+                points,
+                className: 'dice-poly-shape'
+              }),
+              React.createElement('text', {
+                x: 50, y: 58, textAnchor: 'middle', fontSize: 36, fill: 'white', fontWeight: 'bold',
+                className: 'dice-poly-text'
+              }, diceResult)
+            );
+          }
+          // d100: show badge
+          if (diceType === 100) {
+            return React.createElement('div', { className: 'dice-face dice-badge' }, diceResult);
+          }
+          // fallback
+          return React.createElement('div', { className: 'dice-face' }, diceResult);
+        }
+
+        return React.createElement('div', { className: 'dice-roller' },
+          React.createElement('h3', null, '🎲 Dice Roller'),
+          React.createElement('div', { className: 'dice-controls' },
+            React.createElement('label', null, 'Dice Type: '),
+            React.createElement('select', {
+              value: diceType,
+              onChange: (e) => setDiceType(parseInt(e.target.value))
+            },
+              React.createElement('option', { value: 4 }, 'd4'),
+              React.createElement('option', { value: 6 }, 'd6'),
+              React.createElement('option', { value: 8 }, 'd8'),
+              React.createElement('option', { value: 10 }, 'd10'),
+              React.createElement('option', { value: 12 }, 'd12'),
+              React.createElement('option', { value: 20 }, 'd20'),
+              React.createElement('option', { value: 100 }, 'd100')
+            )
+          ),
+          React.createElement('button', {
+            onClick: rollDice,
+            className: 'dice-button'
+          }, 'Roll Dice'),
+          diceResult && React.createElement('div', { className: 'dice-result' }, renderDiceFace())
+        );
+      }
+
+      // Color Generator Component
+      function ColorGenerator() {
+        const [color, setColor] = useState('#ffffff');
+
+        const generateColor = () => {
+          const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+          setColor(randomColor);
+        };
+
+        return React.createElement('div', { className: 'color-generator' },
+          React.createElement('h3', null, '🎨 Color Generator'),
+          React.createElement('button', {
+            onClick: generateColor,
+            className: 'color-button'
+          }, 'Generate Color'),
+          React.createElement('div', { className: 'color-display' },
+            React.createElement('div', {
+              style: {
+                backgroundColor: color,
+                width: '100px',
+                height: '100px',
+                border: '2px solid #333',
+                borderRadius: '10px',
+                margin: '10px 0'
+              }
+            }),
+            React.createElement('p', null, `Color: ${color}`)
+          )
+        );
+      }
+
+      // Main App Component
+      function App() {
+        return React.createElement('div', { className: 'react-app' },
+          React.createElement(DiceRoller),
+          React.createElement('hr', { style: { margin: '20px 0' } }),
+          React.createElement(ColorGenerator)
+        );
+      }
+
+      // Render React app
+      ReactDOM.render(React.createElement(App), document.getElementById('react-root'));
     </script>
 </body>
 </html>
