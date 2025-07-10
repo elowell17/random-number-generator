@@ -1,0 +1,103 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #e6f3ff;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #f5f5dc;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 10px;
+}
+
+h2 {
+  color: #555;
+  margin-top: 30px;
+}
+
+button {
+  background: linear-gradient(45deg, #2c3e50, #34495e);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+#result {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+  background: #1a1a1a;
+}
+
+body.dark-mode .container {
+  background: #2d2d2d;
+  box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+}
+
+body.dark-mode h1 {
+  color: #ffffff;
+  border-bottom-color: #667eea;
+}
+
+body.dark-mode h2 {
+  color: #cccccc;
+}
+
+body.dark-mode #result {
+  background: #3a3a3a;
+  color: #ffffff;
+  border-left-color: #667eea;
+}
+
+/* Dark mode toggle button */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Smooth transitions for theme switching */
+body, .container, h1, h2, #result {
+  transition: all 0.3s ease;
+} 

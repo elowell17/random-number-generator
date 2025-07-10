@@ -3,62 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>My Website</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #e6f3ff;
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #f5f5dc;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    h1 {
-      color: #333;
-      text-align: center;
-      border-bottom: 3px solid #667eea;
-      padding-bottom: 10px;
-    }
-
-    h2 {
-      color: #555;
-      margin-top: 30px;
-    }
-
-    button {
-      background: linear-gradient(45deg, #2c3e50, #34495e);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    #result {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 8px;
-      border-left: 4px solid #667eea;
-      font-weight: bold;
-      color: #333;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
   <div class="container">
     <h1>Hello World!</h1>
     <p>This is my first website.</p>
@@ -135,9 +83,37 @@
         chart.update();
       }
 
+      // Theme toggle functionality
+      function toggleTheme() {
+        const body = document.body;
+        const toggleBtn = document.querySelector('.theme-toggle');
+        
+        if (body.classList.contains('dark-mode')) {
+          body.classList.remove('dark-mode');
+          toggleBtn.textContent = '🌙 Dark Mode';
+          localStorage.setItem('theme', 'light');
+        } else {
+          body.classList.add('dark-mode');
+          toggleBtn.textContent = '☀️ Light Mode';
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+
+      // Load saved theme preference
+      function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const toggleBtn = document.querySelector('.theme-toggle');
+        
+        if (savedTheme === 'dark') {
+          document.body.classList.add('dark-mode');
+          toggleBtn.textContent = '☀️ Light Mode';
+        }
+      }
+
       // Create the heatmap chart
       let chart;
       window.onload = function() {
+        loadTheme(); // Load theme on page load
         const ctx = document.createElement('canvas');
         ctx.style.marginTop = '20px';
         document.querySelector('.container').appendChild(ctx);
