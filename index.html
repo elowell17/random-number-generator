@@ -4,24 +4,52 @@
   <meta charset="UTF-8">
   <title>My Website</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- Tailwind CSS CDN (for development) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: '#49515A', // Hale Navy
+            primary: '#7A7C6D', // Vintage Vogue
+            secondary: '#A08C8B', // Sulking Room Pink
+            accent: '#A89CA5', // Autumn Orchid
+            surface: '#DFDCD3', // Shoji White
+            surfacealt: '#CFC7B8', // Shiitake
+            info: '#7A807B', // Homburg Gray
+            success: '#5B5E4E', // Shade Grown
+            warning: '#5B5853', // Urbane Bronze
+            danger: '#2B3530', // Black Forest Green
+            muted: '#5C5B60', // Perle Noir
+            dark: '#484B4D', // Soot
+          }
+        }
+      }
+    }
+  </script>
   <!-- React CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <!-- Babel for JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body>
+<body class="bg-background">
+  <nav class="w-full bg-primary text-surface shadow flex items-center justify-between px-6 py-4">
+    <div class="flex items-center space-x-2">
+      <!-- Heroicon: Academic Cap -->
+      <svg class="w-7 h-7 text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6m0 0c-4.418 0-8-1.79-8-4V10m8 10c4.418 0 8-1.79 8-4V10"/></svg>
+      <span class="font-bold text-xl tracking-wide">Dark Academia RNG</span>
+    </div>
+    <div class="flex space-x-4">
+      <button class="tab-link font-semibold px-3 py-1 rounded hover:bg-accent hover:text-primary transition" data-tab="numbers">Numbers</button>
+      <button class="tab-link font-semibold px-3 py-1 rounded hover:bg-accent hover:text-primary transition" data-tab="dice">Dice</button>
+      <button class="tab-link font-semibold px-3 py-1 rounded hover:bg-accent hover:text-primary transition" data-tab="colors">Colors</button>
+    </div>
+  </nav>
   <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
-  <div class="container">
-    <h1>Hello World!</h1>
-    <p>This is my first website.</p>
-    
-    <h2>Random Number Generator</h2>
-    <button onclick="generateNumber()">Generate Random Number</button>
-    <button onclick="generate100Numbers()" style="margin-left: 10px;">Generate 100 Numbers</button>
-    <p id="result">Click the button to generate a number!</p>
-    
-    <h2>React Components</h2>
+  <div class="max-w-xl mx-auto bg-surface dark:bg-dark rounded-2xl shadow-2xl p-8 mt-10 flex flex-col items-center space-y-6 transition-all duration-300">
     <div id="react-root"></div>
   </div>
 
@@ -124,7 +152,7 @@
         loadTheme(); // Load theme on page load
         const ctx = document.createElement('canvas');
         ctx.style.marginTop = '20px';
-        document.querySelector('.container').appendChild(ctx);
+        document.getElementById('heatmap').appendChild(ctx);
         
         // Initialize with zeros
         const initialData = [];
@@ -143,13 +171,13 @@
               data: initialData,
               backgroundColor: function(context) {
                 const value = context.dataset.data[context.dataIndex];
-                if (value === 0) return '#f0f0f0'; // Light gray for 0
-                if (value === 1) return '#ffeb3b'; // Yellow for 1
-                if (value === 2) return '#ff9800'; // Orange for 2
-                if (value === 3) return '#f44336'; // Red for 3+
-                return '#d32f2f'; // Dark red for 4+
+                if (value === 0) return getComputedStyle(document.documentElement).getPropertyValue('--color-surfacealt').trim(); // surfacealt
+                if (value === 1) return getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim(); // primary
+                if (value === 2) return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim(); // accent
+                if (value === 3) return getComputedStyle(document.documentElement).getPropertyValue('--color-secondary').trim(); // secondary
+                return getComputedStyle(document.documentElement).getPropertyValue('--color-danger').trim(); // danger
               },
-              borderColor: '#ddd',
+              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-muted').trim(),
               borderWidth: 1
             }]
           },
@@ -185,6 +213,47 @@
 
       // React Components
       const { useState } = React;
+
+      // Tabbed App
+      function TabbedApp() {
+        const [tab, setTab] = useState('numbers');
+
+        React.useEffect(() => {
+          // Set up click handlers for nav bar
+          const links = document.querySelectorAll('.tab-link');
+          links.forEach(link => {
+            link.onclick = () => setTab(link.getAttribute('data-tab'));
+          });
+        }, []);
+
+        return React.createElement('div', {},
+          tab === 'numbers' && React.createElement(NumbersPage),
+          tab === 'dice' && React.createElement(DiceRoller),
+          tab === 'colors' && React.createElement(ColorGenerator)
+        );
+      }
+
+      // Numbers Page (heatmap + number generator)
+      function NumbersPage() {
+        return React.createElement('div', {},
+          React.createElement('h2', { className: 'text-2xl font-bold text-secondary mt-6 mb-2' }, 'Random Number Generator'),
+          React.createElement('div', { className: 'flex flex-row space-x-4 mb-4' },
+            React.createElement('button', {
+              onClick: generateNumber,
+              className: 'bg-primary text-surface px-6 py-3 rounded-full shadow-lg hover:scale-105 transition font-semibold text-lg'
+            }, 'Generate Random Number'),
+            React.createElement('button', {
+              onClick: generate100Numbers,
+              className: 'bg-secondary text-surface px-6 py-3 rounded-full shadow-lg hover:scale-105 transition font-semibold text-lg'
+            }, 'Generate 100 Numbers')
+          ),
+          React.createElement('p', {
+            id: 'result',
+            className: 'bg-surfacealt p-4 rounded-lg border-l-4 border-accent font-bold text-dark w-full text-center'
+          }, 'Click the button to generate a number!'),
+          React.createElement('div', { id: 'heatmap', className: 'w-full mt-6' })
+        );
+      }
 
       // Dice Roller Component
       function DiceRoller() {
@@ -303,7 +372,7 @@
                 backgroundColor: color,
                 width: '100px',
                 height: '100px',
-                border: '2px solid #333',
+                border: '2px solid ' + getComputedStyle(document.documentElement).getPropertyValue('--color-muted').trim(),
                 borderRadius: '10px',
                 margin: '10px 0'
               }
@@ -316,9 +385,7 @@
       // Main App Component
       function App() {
         return React.createElement('div', { className: 'react-app' },
-          React.createElement(DiceRoller),
-          React.createElement('hr', { style: { margin: '20px 0' } }),
-          React.createElement(ColorGenerator)
+          React.createElement(TabbedApp)
         );
       }
 
